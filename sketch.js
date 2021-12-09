@@ -1,13 +1,19 @@
+var PLAY=1;
+var FIM=0;
+var estadojogo=PLAY;
+
+
 var trex, trex_running, edges;
 var groundImage,ground,groundinvisivel;
-var nuvem, nuvemimage;
-var obstaculo,obstaculo1,obstaculo2,obstaculo3,obstaculo4,obstaculo5,obstaculo6;
+var nuvem, nuvemimage, groupnuvem;
+var obstaculo,obstaculo1,obstaculo2,obstaculo3,obstaculo4,obstaculo5,obstaculo6, groupobstaculo;
 var pontos ;
+
 
 function preload(){
   trex_running = loadAnimation("trex1.png","trex3.png","trex4.png");
   groundImage = loadImage("ground2.png");
-  nuvemimage = loadImage("cloud.png");
+  nuvemimage = loadImage("cloud.png"); 
   obstaculo1 = loadImage("obstacle1.png");
   obstaculo2 = loadImage("obstacle2.png");
   obstaculo3 = loadImage("obstacle3.png");
@@ -38,6 +44,14 @@ ground.x=ground.width/2
 groundinvisivel =createSprite(200,190,400,10);
 groundinvisivel.visible=false
 pontos=0
+
+ //criando grupo
+
+groupnuvem = new Group();
+groupnuvem = new Group();
+
+
+
 }
 
 
@@ -49,13 +63,17 @@ function draw(){
 //pontuação do jogo
 text ("pontuação: "+pontos,300,50)
 
-pontos=pontos+ Math.round(frameCount/100)
-//velocidade do chão
-ground.velocityX=-2;
-
-
+if (estadojogo==PLAY){
   
-//condiçao tela infinita
+  //velocidade do chão
+  ground.velocityX=-2;
+  
+  //pontuação
+  pontos=pontos+ Math.round(frameCount/100)
+  
+
+
+  //condiçao tela infinita
 if (ground.x<0){
   ground.x=ground.width/2
 }
@@ -67,13 +85,34 @@ if (ground.x<0){
   
   trex.velocityY = trex.velocityY + 0.5;
   
- //impedir que o trex caia
-  trex.collide(groundinvisivel);
+ 
 
   //criar nuvens
   criarnuvens();
   //criar obstaculos
   criarobstaculo();
+
+if(groupobstaculo.isTouching(trex)){
+  estadojogo = FIM;
+}
+}
+
+else if (estadojogo==FIM){
+
+  ground.velocityX=0
+ //nuvem e objeto parada
+  groupobstaculo.setVelocityXEach(0);
+  groupnuvem.setVelocityXEach(0);
+}
+
+//impedir que o trex caia
+trex.collide(groundinvisivel);
+
+
+
+
+  
+
   drawSprites();
 }
 function criarnuvens (){
@@ -89,6 +128,8 @@ function criarnuvens (){
   // tempo de vida das nuvens
   nuvem.lifetime = 200;
 
+  groupnuvem.add(nuvem);
+  
 }
 }
 
@@ -118,6 +159,8 @@ function criarobstaculo (){
 //mudar o tamanho do obstaculo 
 obstaculo.scale=0.5
 obstaculo.lifetime=200
+
+groupobstaculo.add(obstaculo);
 
 }
 }
